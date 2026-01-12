@@ -1,4 +1,4 @@
-from flask import Flask 
+from flask import Flask
 from routes.home import home_page
 from routes.BookRecommender import book_page
 from routes.MovieRecommender import movie_page
