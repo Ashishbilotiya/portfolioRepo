@@ -1,7 +1,7 @@
 
 import numpy as np
 from flask import render_template ,request ,Blueprint
-from portfolioRepo.models.load_models import load_books , load_books_pt, load_books_similarity_score
+from models.load_models import load_books , load_books_pt, load_books_similarity_score
 
 books = None
 
