@@ -8,7 +8,7 @@
 <section class = " container-fluid bg-dark">
   <div class="row">
     <div class="col-9">
-      <form action="/BookRecommender" method="POST">
+      <form action="{{ url_for('BookRecommender.book_recommender_page') }}" method="POST">
         <div class ="text-start text-light">
           <h1> Book Recommender  </h1>
         </div>
