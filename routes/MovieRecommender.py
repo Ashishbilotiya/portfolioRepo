@@ -1,6 +1,6 @@
 
 from flask import render_template ,request ,Blueprint
-from models import load_movies, load_movies_similarity_score
+from portfolioRepo.models.load_models import load_movies, load_movies_similarity_score
 
 movies = None
 
