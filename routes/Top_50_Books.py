@@ -1,6 +1,6 @@
 
 from flask import render_template,Blueprint
-from portfolioRepo.models.load_models import load_famous_books
+from models.load_models import load_famous_books
 
 
 top_books_page = Blueprint("top_books",__name__)
