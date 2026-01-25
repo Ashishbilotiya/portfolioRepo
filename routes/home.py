@@ -1,75 +1,70 @@
-
-from flask import render_template,Blueprint, request, redirect, url_for, flash
-import base64
-from email.mime.text import MIMEText
-from googleapiclient.discovery import build
+from flask import render_template, Blueprint, request, redirect, url_for, flash
 import os
-from google.oauth2.credentials import Credentials
+import requests
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
-home_page = Blueprint("home",__name__)
+home_page = Blueprint("home", __name__)
 
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 EMAIL_RECEIVER = os.getenv("EMAIL_RECEIVER")
-GOOGLE_REFRESH_TOKEN = os.getenv("GOOGLE_REFRESH_TOKEN")
-
-
-
-def get_gmail_service():
-    creds = Credentials(
-        token=None,
-        refresh_token=GOOGLE_REFRESH_TOKEN,
-        token_uri="https://oauth2.googleapis.com/token",
-        client_id=GOOGLE_CLIENT_ID,
-        client_secret=GOOGLE_CLIENT_SECRET,
-        scopes=["https://www.googleapis.com/auth/gmail.send"]
-    )
-    return build("gmail", "v1", credentials=creds)
-
-
-
+EMAIL_SENDER = os.getenv("EMAIL_SENDER")
 
 def send_email(name, email, message):
-    service = get_gmail_service()
+    url = "https://api.brevo.com/v3/smtp/email"
 
-    body = f"""
-    Name: {name}
-    Email: {email}
+    headers = {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json"
+    }
 
-    Message:
-    {message}
-    """
+    payload = {
+        "sender": {
+            "name": "myportfolioapp",
+            "email": EMAIL_SENDER
+        },
+        "to": [
+            {
+                "email": EMAIL_RECEIVER,
+                "name": "Ashish"
+            }
+        ],
+        "subject": "New Portfolio Contact Message",
+        "htmlContent": f"""
+        <h3>New Contact Message</h3>
+        <p><strong>Name:</strong> {name}</p>
+        <p><strong>Email:</strong> {email}</p>
+        <p><strong>Message:</strong><br>{message}</p>
+        """
+    }
 
-    msg = MIMEText(body)
-    msg["to"] = EMAIL_RECEIVER
-    msg["subject"] = "New Portfolio Contact Message"
+    response = requests.post(url, json=payload, headers=headers)
 
-    raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
-    service.users().messages().send(
-        userId="me",
-        body={"raw": raw}
-    ).execute()
+    if response.status_code not in [200, 201, 202]:
+        raise Exception(response.text)
 
 
-
-@home_page.route("/",methods=["POST","GET"])
+@home_page.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        name = str(request.form.get("name"))
-        email = str(request.form.get("email"))
-        message = str(request.form.get("message"))
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+
         if name and email and message:
             try:
                 send_email(name, email, message)
-                flash("Message sent successfully! I will contact you soon.", "success")
+                flash("Message sent successfully! 🚀", "success")
             except Exception as e:
                 flash("Error! Message could not be sent.", "danger")
-                raise e
-            return  redirect(url_for("home.home",_anchor="contact"))
+                print(e)
+
+            return redirect(url_for("home.home", _anchor="contact"))
+
     return render_template("home/home.html")
+
 
 
