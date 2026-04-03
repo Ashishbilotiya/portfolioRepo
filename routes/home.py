@@ -40,7 +40,8 @@ def send_email(name, email, message):
         <p><strong>Message:</strong><br>{message}</p>
         """
     }
-
+    print("Status Code:", response.status_code)
+    print("Response:", response.text)
     response = requests.post(url, json=payload, headers=headers)
 
     if response.status_code not in [200, 201, 202]:
