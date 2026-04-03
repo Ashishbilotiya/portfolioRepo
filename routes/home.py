@@ -61,8 +61,9 @@ def home():
                 send_email(name, email, message)
                 flash("Message sent successfully! 🚀", "success")
             except Exception as e:
-                flash("Error! Message could not be sent.", "danger")
                 print(e)
+                flash("Error! Message could not be sent.", "danger")
+                
 
             return redirect(url_for("home.home", _anchor="contact"))
 
