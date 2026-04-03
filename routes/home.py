@@ -14,6 +14,7 @@ EMAIL_SENDER = os.getenv("EMAIL_SENDER")
 
 def send_email(name, email, message):
     url = "https://api.brevo.com/v3/smtp/email"
+    print("API:", BREVO_API_KEY)
 
     headers = {
         "accept": "application/json",
